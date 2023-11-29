@@ -33,12 +33,12 @@ def add_insurance():
     label2.pack(pady=10)
     entry2 = tk.Entry(add_window, show="*")
     entry2.pack(pady=10)
-    #label3 = tk.Label(cancel_window, text="請輸入自然人憑證之身分證號：")
-    #label3.pack(pady=10)
-    #entry3 = tk.Entry(cancel_window, show="*")
-    #entry3.pack(pady=10)
-    confirm_button = tk.Button(add_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get()))
-    #confirm_button = tk.Button(add_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get(), entry3.get())) #若要新增身分證號的輸入
+    label3 = tk.Label(add_window, text="請輸入自然人憑證之身分證號\n(若為被加退保人則留空)：")
+    label3.pack(pady=10)
+    entry3 = tk.Entry(add_window, show="*")
+    entry3.pack(pady=10)
+    #confirm_button = tk.Button(add_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get()))
+    confirm_button = tk.Button(add_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get(), entry3.get())) #若要新增身分證號的輸入
     confirm_button.pack(pady=10)
 
 def cancel_insurance():
@@ -55,35 +55,35 @@ def cancel_insurance():
     label2.pack(pady=10)
     entry2 = tk.Entry(cancel_window, show="*")
     entry2.pack(pady=10)
-    #label3 = tk.Label(cancel_window, text="請輸入自然人憑證之身分證號：")
-    #label3.pack(pady=10)
-    #entry3 = tk.Entry(cancel_window, show="*")
-    #entry3.pack(pady=10)
-    confirm_button = tk.Button(cancel_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get()))
-    #confirm_button = tk.Button(add_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get(), entry3.get())) #若要新增身分證號的輸入
+    label3 = tk.Label(cancel_window, text="請輸入自然人憑證之身分證號\n(若為被加退保人則留空)：")
+    label3.pack(pady=10)
+    entry3 = tk.Entry(cancel_window, show="*")
+    entry3.pack(pady=10)
+    #confirm_button = tk.Button(cancel_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get()))
+    confirm_button = tk.Button(cancel_window, text="確定", command=lambda: save_identifier(entry.get(), entry2.get(), entry3.get())) #若要新增身分證號的輸入
     confirm_button.pack(pady=10)
 
 saved_identifier = ""
 saved_pin = 0
 user_choice = ""
-def save_identifier(identifier, pin):
-    global saved_identifier, saved_pin
-    saved_identifier = identifier
-    saved_pin = pin
-    window.quit()     # 結束視窗的事件循環
-    print("選擇：", user_choice)  # 將選擇結果輸出在終端
-    print("被加/退保人之代號：", identifier)
-
-#若要新增身分證號的輸入
-#saved_identity_Num = ""
-# def save_identifier(identifier, pin, identity_Num): 
-#     global saved_identifier, saved_pin, saved_identity_Num
-#     saved_identity_Num = identity_Num
+# def save_identifier(identifier, pin):
+#     global saved_identifier, saved_pin
 #     saved_identifier = identifier
 #     saved_pin = pin
 #     window.quit()     # 結束視窗的事件循環
 #     print("選擇：", user_choice)  # 將選擇結果輸出在終端
 #     print("被加/退保人之代號：", identifier)
+
+#若要新增身分證號的輸入
+saved_identity_Num = ""
+def save_identifier(identifier, pin, identity_Num): 
+    global saved_identifier, saved_pin, saved_identity_Num
+    saved_identity_Num = identity_Num
+    saved_identifier = identifier
+    saved_pin = pin
+    window.quit()     # 結束視窗的事件循環
+    print("選擇：", user_choice)  # 將選擇結果輸出在終端
+    print("被加/退保人之代號：", identifier)
 
 # 建立主視窗
 window = tk.Tk()
@@ -121,8 +121,10 @@ driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_option
 
 driver.get("https://edesk.bli.gov.tw/cpa/")
 time.sleep(1)
-driver.find_element(By.CSS_SELECTOR, "input[placeholder='請輸入身分證號']").send_keys(df.at[2, saved_identifier]) #使用被加退保人之自然人憑證
-#driver.find_element(By.CSS_SELECTOR, "input[placeholder='請輸入身分證號']").send_keys("saved_identity_Num") #使用其他人之自然人憑證
+if saved_identity_Num == "":
+   driver.find_element(By.CSS_SELECTOR, "input[placeholder='請輸入身分證號']").send_keys(df.at[2, saved_identifier]) #使用被加退保人之自然人憑證
+else:
+   driver.find_element(By.CSS_SELECTOR, "input[placeholder='請輸入身分證號']").send_keys(saved_identity_Num) #使用其他人之自然人憑證
 driver.find_element(By.CSS_SELECTOR, "input[placeholder='含檢查碼共9位']").send_keys("15118422B") #保險證號
 driver.find_element(By.CSS_SELECTOR, "input[placeholder='請輸入6-8碼密碼']").send_keys(saved_pin) #自然人憑證pin碼
 driver.find_element(By.CSS_SELECTOR, "button[aria-label='Close']").click()
